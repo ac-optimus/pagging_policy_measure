@@ -1,27 +1,33 @@
-all: build run_performance_test
+all: build run plot
 
 CC=gcc
-DST=build
-SRC=src
-# path of project directory
-# HOME=$(shell pwd)
-# path to the implementations
-# BINARIES=$(HOME)/build
 
 build:
-	@mkdir build
 	@mkdir plots
 	@mkdir summary
 
-run_performance_test:build_performance_test
-	@$(shell  ./scripts/run_analysis.sh)
+run: build_performance_test
+	@./work_load_performance RANDOM
+	@./work_load_performance LOCAL
+	@./work_load_performance LOOP
+	@./work_load_performance LOCAL USE_LRU_APPROX
 
 build_performance_test:
 	@echo "Building..."
-	@gcc $(SRC)/performance_measure_lru.c -o $(DST)/lru
-	@gcc $(SRC)/performance_measure_lru_approx.c -o $(DST)/lru_approx
+	@echo "Building tests. Run: make test"
+	@$(CC) checker.c -o test
+	@$(CC) main.c -o work_load_performance
 
+test: build_performance_test
+	@./test
+
+plot: build_performance_test
+	@echo "plots saved in plots/"
+	@python scripts/plot_figure_lru.py RANDOM
+	@python scripts/plot_figure_lru.py LOCAL
+	@python scripts/plot_figure_lru.py LOOP
+	@python scripts/plot_figure_lru_approx.py LOCAL
 
 clean:
 	@echo "Cleaning..."
-	@rm -r build plots summary
+	@rm -r plots summary work_load_performance test

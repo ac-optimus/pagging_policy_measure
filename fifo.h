@@ -1,15 +1,12 @@
 /* fifo implementation using doubly linked list
 enter the queue using enqueue at front  and get dequeue from rear*/
 
-
-
 // node structure
 typedef struct _q_node{
     unsigned page_number; // the page number stored in this QNode
     struct _q_node *nxt;
     struct _q_node *prev;
 }q_node;
-
 
 // queue data structure
 typedef struct _queue{
@@ -31,7 +28,6 @@ queue* create_queue(int size){
     return cur_queue;
 }
 
-
 //check if queue is empty
 int is_empty(queue* cur_queue){
     // return 0 if queue is not empty else return 1
@@ -40,14 +36,12 @@ int is_empty(queue* cur_queue){
     return 0;
 }
 
-
 int is_full(queue* cur_queue){
     // return 1 if queue is full else return 0
     if (cur_queue->filled== cur_queue->size)
         return 1;
     return 0;
 }
-
 
 // enqueue
 q_node* enqueue(queue* cur_queue, int enqueue_val){
@@ -96,5 +90,3 @@ int dequeue(queue* cur_queue){
     // printf("----%d---\n",cur_queue->filled);
     return val;
 }
-
-

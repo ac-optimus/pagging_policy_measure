@@ -1,10 +1,6 @@
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <time.h>
-// #include "fifo.h"
+// This file contains all the functions related to the replacement policies -- RANDOM, FIFO, LRU, LRU Approx.
 
-
+#include "fifo.h"
 
 typedef struct _hashmap{
     int size;
@@ -33,7 +29,6 @@ int get_random_index(int lower, int upper){
 // c=a=b=d
 
 int compare_nodes(q_node* node1, q_node* node2){
-    // printf("ASDf\n");
     if ((node1 == NULL) && (node2 == NULL))
         return 1;
     if (((node1 != NULL) &&(node2 == NULL)) ||  ((node1 == NULL) &&(node2 != NULL)))
@@ -55,7 +50,6 @@ void remove_a_queue_node(queue* cur_queue, q_node* cur_node){
         cur_queue->rear= cur_node->prev;
     else if ((compare_nodes(cur_node, cur_queue->front)==1))
         cur_queue->front= cur_node->nxt;
-
     else{
         q_node* prev_ptr= cur_node->prev;
         q_node* next_ptr= cur_node->nxt;
@@ -69,7 +63,7 @@ void remove_a_queue_node(queue* cur_queue, q_node* cur_node){
     free(cur_node);
 }
 
-int va_to_pa_FIFO(hashmap* hash, queue* cur_queue, int page_num){
+int cache_FIFO(hashmap* hash, queue* cur_queue, int page_num){
     // check if curqueue is full, if full then pop from rear and add to the front
     // return 1 if a hit else return 0
     if (hash->mapping[page_num] != NULL)
@@ -83,7 +77,7 @@ int va_to_pa_FIFO(hashmap* hash, queue* cur_queue, int page_num){
     return 0;
 }
 
-int va_to_pa_LRU(hashmap* hash, queue* cur_queue, int page_num){
+int cache_LRU(hashmap* hash, queue* cur_queue, int page_num){
     // return 1 for hit and 0 for miss
     if (hash->mapping[page_num] != NULL){ // hit
         // bring it to the front and stitch the queue nodes accodringly such that order is not disturbed
@@ -101,7 +95,7 @@ int va_to_pa_LRU(hashmap* hash, queue* cur_queue, int page_num){
     return 0;
 }
 
-int va_to_pa_RANDOM(hashmap* hash, queue* cur_queue, int page_num, int cache_size, int hash_size){
+int cache_RANDOM(hashmap* hash, queue* cur_queue, int page_num, int cache_size, int hash_size){
     // return 1 for hit and 0 for miss
     if (hash->mapping[page_num] != NULL){
         // hit
@@ -120,13 +114,9 @@ int va_to_pa_RANDOM(hashmap* hash, queue* cur_queue, int page_num, int cache_siz
         }
         int replace_page_num= get_random_index(0, cache_size-1);  // get a random number to replace
         // printf("random index selected is-- %d, and the value %d is to be replaced by %d\n", replace_page_num, array[replace_page_num]->page_number, page_num);
-
         hash->mapping[array[replace_page_num]->page_number]=NULL;
-
         array[replace_page_num]->page_number= page_num;
-
         hash->mapping[page_num]=array[replace_page_num];
-
     }
     else
         hash->mapping[page_num]= enqueue(cur_queue, page_num);
@@ -134,7 +124,7 @@ int va_to_pa_RANDOM(hashmap* hash, queue* cur_queue, int page_num, int cache_siz
 }
 
 
-int va_to_pa_LRU_APRROX(hashmap* hash, queue* cur_queue, int bits[], int page_num, int cache_size, int hash_size){
+int cache_LRU_APRROX(hashmap* hash, queue* cur_queue, int bits[], int page_num, int cache_size, int hash_size){
     // use the same doubly linked list
     // anohter bit array that will keep track of the current bit for each node in the doubly ll
     // a pointer pointer called clock hand to point the node that was just now refferenced
